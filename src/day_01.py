@@ -53,7 +53,7 @@ class Algorithm:
 #-------------------------------------------------------------------+
 if __name__ == "__main__":
 	separator = "\r\n+----------------------------+\r\n"
-	filename = "{}/input.txt".format(os.path.dirname(__file__))
+	filename = "{}/../data/input.txt".format(os.path.dirname(__file__))
 
 	print(separator)
 
