@@ -37,7 +37,6 @@ class Algorithm:
 		# regular expression works on string format as found in input text
 		regex = re.compile("(?P<yes>\d+)-(?P<no>\d+) (?P<letter>\w): (?P<pwd>\w+)")
 
-
 		num_valid = 0
 
 		for item in entries:

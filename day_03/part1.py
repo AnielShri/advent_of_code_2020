@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------+
 #
-# Advent of Code - Day 2 - Part 1
+# Advent of Code - Day 3 - Part 1
 #
 #-------------------------------------------------------------------+
 
@@ -33,35 +33,31 @@ class Algorithm:
 			return entries
 
 	# core of algorithm
-	def _valid_entries(self, entries:List[str]) -> int:
-		# regular expression works on string format as found in input text
-		regex = re.compile("(?P<min>\d+)-(?P<max>\d+) (?P<letter>\w): (?P<pwd>\w+)")
+	def _count_trees(self, entries:List[str]) -> int:
+		num_trees = 0
+		col = 0
+		max_col = len(entries[0])
 
-		num_valid = 0
+		for row in entries:
+			if row[col] == "#":
+				num_trees = num_trees + 1
+			# end if 
 
-		for item in entries:
-			parts = regex.match(item)
-
-			count = 0
-			for n in parts.group("pwd"):
-				if n == parts.group("letter"):
-					count = count + 1
-			#end for
-
-			if count >= int(parts.group("min")) and count <= int(parts.group("max")):
-				num_valid = num_valid + 1
-				
-		#end for
-
-		return num_valid		
+			# calculate next index, account for overflow -> repeating biome pattern
+			col = col + 3
+			if col >= max_col:
+				col = col - max_col
+		# end for
+		
+		return num_trees		
 
 	# public function 
 	def execute(self, filename:str) -> int:
 		entries = self._load_data(filename)
 
-		valid_entries = self._valid_entries(entries)
+		num_trees = self._count_trees(entries)
 
-		return valid_entries
+		return num_trees
 		
 
 #-------------------------------------------------------------------+
