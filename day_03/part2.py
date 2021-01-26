@@ -42,7 +42,7 @@ class Algorithm:
 		max_row = len(entries)
 
 		# we're not stepping through each entry, so use an infinite loop, and break at end of list
-		while True:
+		for row in range(0, max_row, down): # start, stop, step
 			item = entries[row]
 			if item[col] == "#":
 				num_trees = num_trees + 1
@@ -50,11 +50,6 @@ class Algorithm:
 
 			# calculate next col, account for overflow -> repeating biome pattern
 			col = (col + right) %  max_col
-			
-			# move down until end last entry
-			row = row + down
-			if row >= max_row:
-				break
 		#end loop
 
 		return num_trees		
