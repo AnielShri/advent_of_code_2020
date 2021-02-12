@@ -4,6 +4,9 @@
 #
 # Advent of Code - Day 4 - Part 2
 #
+# I tried to complete this one without using regular expressions
+# Note: I should look up has maps, might be easier 
+#
 #-------------------------------------------------------------------+
 
 #-------------------------------------------------------------------+
