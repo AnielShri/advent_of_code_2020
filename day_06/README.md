@@ -12,6 +12,13 @@ Algorihm is fairly straight forward.
 	* If the previous value was 0 -> new value = 1
 	* if the previous value was 1 -> new value is still equal to 1
 	* In other words: the index value can only be 0 or 1, effectively counting only unique answers
+* The answer array for the group bellow is: `[0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0]` 
+```
+dcqgyiflm
+gqcfn
+fcqgwnh
+qpgfkhbc
+```
 * At the end of the loop the sum of the answer array is calculated to determine the total number of unique answers
 
 ```python
