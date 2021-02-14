@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------+
 #
-# Advent of Code - Day 6 - Part 1
+# Advent of Code - Day 6 - Part 2
 #
 #-------------------------------------------------------------------+
 
@@ -40,6 +40,7 @@ class Algorithm:
 			"a",
 			"",
 			"b",
+			"",
 		])
 
 		return adv_data.split("\n\n")
@@ -64,25 +65,43 @@ class Algorithm:
 
 	def _unique_answers(self, item:str) -> int:
 		ord_a = ord("a")
-		all_answers = [0] * (ord("z") - ord_a + 1)
-		# print(len(all_answers))
-		for letter in item.replace("\n", ""):	
-			all_answers[ord(letter) - ord_a] = 1
-		print(all_answers)
-		return sum(all_answers)
+		all_answers = item.split("\n")
+		# print("all_answers: {}".format(all_answers))
+		group_total = 0x03FFFFFF # initial assumption: all answers are `yes`
+		# unique_yes = 0xFFFFFFFF # initial assumption: all answers are `yes`
+		for inidividual_answer in all_answers:
+			if len(inidividual_answer) == 0: # edge case for last entry -> contains emty array
+				continue					 # causes last total_unique = 0
+			answers = 0
+			for letter in inidividual_answer:
+				answers = answers | (1 << (ord(letter) - ord_a))
+			group_total = group_total & answers
+			# print("{} -> {} @ {}".format(inidividual_answer, unique_yes, answers))
+			print("Unique yes: {:026b} for {:026b} in @ {}".format(group_total, answers, inidividual_answer))
 
-	def _unique_answers_and(self, item:str) -> int:
+		total_unique = 0
+		for bit in range(26):
+			total_unique += (group_total & (1 << bit)) >> bit
+		# print("Final: {:026b} -> total: {}".format(unique_yes, total_unique))
+		return total_unique
+
+
+	def _unique_answers_or(self, item:str) -> int:
 		ord_a = ord("a")
-		all_answers = [1] * (ord("z") - ord_a + 1)
-		# print(len(all_answers))
-		# for letter in item.replace("\n", ""):	
-		for ind_answer in all_answers:
-			cur_answer = [1] * (ord("z") - ord_a + 1)
-			for letter in ind_answer:
+		all_answers = item.split("\n")
+		group_total = 0 # initial assumption: all answers are `no`
+		for inidividual_answer in all_answers:
+			answers = 0
+			for letter in inidividual_answer:
+				answers = answers | (1 << (ord(letter) - ord_a))
+			group_total = group_total | answers
+			# print("{} -> {} @ {}".format(inidividual_answer, unique_yes, answers))
 
-			# all_answers[ord(letter) - ord_a] = 1
-		print(all_answers)
-		return sum(all_answers)		
+		total_unique = 0
+		for bit in range(32):
+			total_unique += ((group_total & (1 << bit)) >> bit)
+		print("Final: {} -> total: {}".format(group_total, total_unique))
+		return total_unique
 
 
 	# public function 
@@ -92,9 +111,11 @@ class Algorithm:
 		yes_count = 0
 
 		for item in entries:
-		# for n in range(1):
+		# for n in range(6):
 			# item = entries[n]
+			# yes_count += self._unique_answers(item)
 			yes_count += self._unique_answers(item)
+			# print("yes_count = {}".format(yes_count))
 
 		return yes_count
 		
