@@ -69,20 +69,20 @@ class Algorithm:
 		# print("all_answers: {}".format(all_answers))
 		group_total = 0x03FFFFFF # initial assumption: all answers are `yes`
 		# unique_yes = 0xFFFFFFFF # initial assumption: all answers are `yes`
-		for inidividual_answer in all_answers:
-			if len(inidividual_answer) == 0: # edge case for last entry -> contains emty array
+		for persons_answer in all_answers:
+			if len(persons_answer) == 0: # edge case for last entry -> contains emty array
 				continue					 # causes last total_unique = 0
 			answers = 0
-			for letter in inidividual_answer:
+			for letter in persons_answer:
 				answers = answers | (1 << (ord(letter) - ord_a))
 			group_total = group_total & answers
-			# print("{} -> {} @ {}".format(inidividual_answer, unique_yes, answers))
-			print("Unique yes: {:026b} for {:026b} in @ {}".format(group_total, answers, inidividual_answer))
+			# print("{} -> {} @ {}".format(persons_answer, group_total, answers))
+			print("Unique yes: {:026b} for {:026b} in @ {}".format(group_total, answers, persons_answer))
 
 		total_unique = 0
 		for bit in range(26):
 			total_unique += (group_total & (1 << bit)) >> bit
-		# print("Final: {:026b} -> total: {}".format(unique_yes, total_unique))
+		print("Final: {:026b} -> total: {}".format(group_total, total_unique))
 		return total_unique
 
 
