@@ -42,11 +42,9 @@ class Algorithm:
 				if b is not None:
 					data.append(b.group("nbr"))
 					data.append(b.group("color"))
-					total += int(b.group("nbr"))
 
 			for _ in range(len(data), 9):
-				data.append(None)
-			data.append(total)
+				data.append("")
 
 			print("{}".format(data))
 
@@ -54,9 +52,9 @@ class Algorithm:
 				INSERT INTO input_data 
 				(
 					root_color, nbr_1, color_1, nbr_2, color_2, 
-					nbr_3, color_3, nbr_4, color_4, nbr_bags
+					nbr_3, color_3, nbr_4, color_4
 				) 
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 			"""
 			self._sql.execute(query, data)
 		# end for
@@ -87,7 +85,6 @@ class Algorithm:
 				"color_3"	TEXT,
 				"nbr_4"	INTEGER DEFAULT 0,
 				"color_4"	TEXT,
-				"nbr_bags"	INTEGER DEFAULT 0,
 				PRIMARY KEY("id" AUTOINCREMENT)
 			)
 			"""
@@ -99,15 +96,15 @@ class Algorithm:
 			ret = False
 
 		# bag_holder table
-		query = "DROP TABLE recursive_bags"
+		query = "DROP TABLE part1_bags"
 
 		try:
 			self._sql.execute(query)
 		except sqlite3.OperationalError as e:			
-			print("Error while delating table: {}".format(e))			
+			print("Error while deleting table: {}".format(e))			
 
 		query = """
-				CREATE TABLE "recursive_bags" (
+				CREATE TABLE "part1_bags" (
 					"id"				INTEGER,
 					"container_color"	TEXT UNIQUE,
 					"child_color"		TEXT,

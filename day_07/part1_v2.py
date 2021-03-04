@@ -22,19 +22,20 @@ from typing import List
 class Algorithm:
 	def __init__(self):
 		self._sql = None
+	# end def
 
 	def _add_initial(self):
 		# the one that starts it all
 		query = """
-			WITH const AS (SELECT "shiny gold" AS name)
-			INSERT OR IGNORE INTO recursive_bags (container_color, child_color)
-			SELECT input_data.root_color, const.name
-			FROM input_data, const
+			WITH search_bag AS (SELECT "shiny gold" AS color)
+			INSERT OR IGNORE INTO part1_bags (container_color, child_color)
+			SELECT input_data.root_color, search_bag.color
+			FROM input_data, search_bag
 			WHERE 
-				input_data.color_1 = const.name OR
-				input_data.color_2 = const.name OR
-				input_data.color_3 = const.name OR
-				input_data.color_4 = const.name
+				input_data.color_1 = search_bag.color OR
+				input_data.color_2 = search_bag.color OR
+				input_data.color_3 = search_bag.color OR
+				input_data.color_4 = search_bag.color
 		"""
 
 		self._sql.execute(query)
@@ -42,7 +43,7 @@ class Algorithm:
 	# end def
 
 	def _get_next_id(self, curr_id:int) -> int:
-		query = 'SELECT id FROM "recursive_bags" WHERE "id" > ? LIMIT 1'
+		query = 'SELECT id FROM "part1_bags" WHERE "id" > ? LIMIT 1'
 		result = self._sql.execute(query, [curr_id])
 
 		next_id = result.fetchone()
@@ -50,30 +51,30 @@ class Algorithm:
 		if next_id is not None:
 			return next_id[0]
 		else:
-			return curr_id
+			return -1
+	# end def
 
 	def _find_containers(self, select_id:int):
 		query = """
-			WITH const AS 
+			WITH search_bag AS 
 				(
-				SELECT container_color FROM recursive_bags WHERE id = ? LIMIT 1
+				SELECT container_color as color FROM part1_bags WHERE id = ? LIMIT 1
 				)
-			INSERT OR IGNORE INTO recursive_bags (container_color, child_color)
-			SELECT input_data.root_color, const.container_color
-			FROM input_data, const
+			INSERT OR IGNORE INTO part1_bags (container_color, child_color)
+			SELECT input_data.root_color, search_bag.color
+			FROM input_data, search_bag
 			WHERE 
-				input_data.color_1 = const.container_color OR
-				input_data.color_2 = const.container_color OR
-				input_data.color_3 = const.container_color OR
-				input_data.color_4 = const.container_color
+				input_data.color_1 = search_bag.color OR
+				input_data.color_2 = search_bag.color OR
+				input_data.color_3 = search_bag.color OR
+				input_data.color_4 = search_bag.color
 		"""
 
 		result = self._sql.execute(query, [select_id])
-
 	# end def
 
 	def _count_containers(self) -> int:
-		query = 'SELECT COUNT(id) FROM recursive_bags'
+		query = 'SELECT COUNT(id) FROM part1_bags'
 
 		result = self._sql.execute(query, [])
 
@@ -94,17 +95,16 @@ class Algorithm:
 			while True:
 				next_id = self._get_next_id(prev_id)
 
-				print("Prev id: {:3d} | Next id: {:3d}".format(
-					prev_id, next_id)
-					)
-
-				if next_id == prev_id:
+				if next_id == -1:
 					break
+
+				print("Next id: {:3d}".format(next_id))
 
 				self._find_containers(next_id)
 				prev_id = next_id
 			# end loop
 
+			# update table
 			self._sql.commit()
 
 			max_containers = self._count_containers()
@@ -116,6 +116,7 @@ class Algorithm:
 			self._sql.close()
 
 		return max_containers
+	# end dif
 
 
 #-------------------------------------------------------------------+
