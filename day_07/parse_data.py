@@ -19,141 +19,165 @@ import sqlite3
 #-------------------------------------------------------------------+
 
 class Algorithm:
-	def __init__(self):
-		self._sql = None
+    def __init__(self):
+        self._sql = None
 
 
-	def _load_data(self, filename:str) -> int:
-		regex = re.compile("(?P<nbr>\d+) (?P<color>\w+ \w+) bag[s]*")
-		num_entries = 0
+    def _load_data(self, filename:str) -> int:
+        regex = re.compile("(?P<nbr>\d+) (?P<color>\w+ \w+) bag[s]*")
+        num_entries = 0
 
-		for line in open(filename):
-			data = []
-			total = 0
-			num_entries += 1
+        for line in open(filename):
+            data = []
+            total = 0
+            num_entries += 1
 
-			line = line.replace(".\n", "")
-			[root, contents] = line.split(" bags contain ")
-			data.append(root)
-			
-			all_bags = contents.split(", ")
-			for bag_descr in all_bags:
-				b = regex.match(bag_descr)
-				if b is not None:
-					data.append(b.group("nbr"))
-					data.append(b.group("color"))
+            line = line.replace(".\n", "")
+            [root, contents] = line.split(" bags contain ")
+            data.append(root)
+            
+            all_bags = contents.split(", ")
+            for bag_descr in all_bags:
+                b = regex.match(bag_descr)
+                if b is not None:
+                    data.append(b.group("nbr"))
+                    data.append(b.group("color"))
 
-			for _ in range(len(data), 9):
-				data.append("")
+            for _ in range(len(data), 9):
+                data.append("")
 
-			print("{}".format(data))
+            print("{}".format(data))
 
-			query = """
-				INSERT INTO input_data 
-				(
-					root_color, nbr_1, color_1, nbr_2, color_2, 
-					nbr_3, color_3, nbr_4, color_4
-				) 
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-			"""
-			self._sql.execute(query, data)
-		# end for
+            query = """
+                INSERT INTO input_data 
+                (
+                    root_color, nbr_1, color_1, nbr_2, color_2, 
+                    nbr_3, color_3, nbr_4, color_4
+                ) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            """
+            self._sql.execute(query, data)
+        # end for
 
-		return num_entries
-	# end def
+        return num_entries
+    # end def
 
-	def _recreate_db(self) -> bool:
-		ret = True
+    def _recreate_db(self) -> bool:
+        ret = True
 
-		# data table
-		query = "DROP TABLE input_data"
+        # data table
+        query = "DROP TABLE input_data"
 
-		try:
-			self._sql.execute(query)
-		except sqlite3.OperationalError as e:			
-			print("Error while delating table: {}".format(e))
+        try:
+            self._sql.execute(query)
+        except sqlite3.OperationalError as e:			
+            print("Error while deleting table: {}".format(e))
 
-		query = """
-			CREATE TABLE "input_data" (
-				"id"	INTEGER,
-				"root_color"	TEXT NOT NULL UNIQUE,
-				"nbr_1"	INTEGER DEFAULT 0,
-				"color_1"	TEXT,
-				"nbr_2"	INTEGER DEFAULT 0,
-				"color_2"	TEXT,
-				"nbr_3"	INTEGER DEFAULT 0,
-				"color_3"	TEXT,
-				"nbr_4"	INTEGER DEFAULT 0,
-				"color_4"	TEXT,
-				PRIMARY KEY("id" AUTOINCREMENT)
-			)
-			"""
+        query = """
+            CREATE TABLE "input_data" (
+                "id"	INTEGER,
+                "root_color"	TEXT NOT NULL UNIQUE,
+                "nbr_1"	INTEGER DEFAULT 0,
+                "color_1"	TEXT,
+                "nbr_2"	INTEGER DEFAULT 0,
+                "color_2"	TEXT,
+                "nbr_3"	INTEGER DEFAULT 0,
+                "color_3"	TEXT,
+                "nbr_4"	INTEGER DEFAULT 0,
+                "color_4"	TEXT,
+                PRIMARY KEY("id" AUTOINCREMENT)
+            )
+            """
 
-		try:
-			self._sql.execute(query)
-		except sqlite3.OperationalError as e:			
-			print("Error while creating table: {}".format(e))
-			ret = False
+        try:
+            self._sql.execute(query)
+        except sqlite3.OperationalError as e:			
+            print("Error while creating table: {}".format(e))
+            ret = False
 
-		# bag_holder table
-		query = "DROP TABLE part1_bags"
+        # bag_holder table
+        query = "DROP TABLE part1_bags"
 
-		try:
-			self._sql.execute(query)
-		except sqlite3.OperationalError as e:			
-			print("Error while deleting table: {}".format(e))			
+        try:
+            self._sql.execute(query)
+        except sqlite3.OperationalError as e:			
+            print("Error while deleting table: {}".format(e))			
 
-		query = """
-				CREATE TABLE "part1_bags" (
-					"id"				INTEGER,
-					"container_color"	TEXT UNIQUE,
-					"child_color"		TEXT,
-					PRIMARY KEY("id" AUTOINCREMENT)
-				)
-			"""
+        query = """
+                CREATE TABLE "part1_bags" (
+                    "id"				INTEGER,
+                    "container_color"	TEXT UNIQUE,
+                    "child_color"		TEXT,
+                    PRIMARY KEY("id" AUTOINCREMENT)
+                )
+            """
 
-		try:
-			self._sql.execute(query)
-		except sqlite3.OperationalError as e:			
-			print("Error while delating table: {}".format(e))	
+        try:
+            self._sql.execute(query)
+        except sqlite3.OperationalError as e:			
+            print("Error while delating table: {}".format(e))	
 
+        # bag_holder table for part 2
+        query = "DROP TABLE part2_bags"
+        
+        try:
+            self._sql.execute(query)
+        except sqlite3.OperationalError as e:			
+            print("Error while deleting table: {}".format(e))
 
-		self._sql.commit()
+        query = """
+            CREATE TABLE "part2_bags" (
+                "id"	INTEGER,
+                "root_color"	TEXT,
+                "mult_factor"	INTEGER DEFAULT 1,
+                "num_children"	INTEGER DEFAULT 0,
+                "tot_bags"      INTEGER DEFAULT 0,
+                PRIMARY KEY("id" AUTOINCREMENT)
+            )
+            """
 
-		return ret
-	# end def
+        try:
+            self._sql.execute(query)
+        except sqlite3.OperationalError as e:			
+            print("Error while creating table: {}".format(e))
+            ret = False			
 
-	def parse(self, filename:str, database:str) -> int:
-		self._sql = sqlite3.connect(database)
+        self._sql.commit()
 
-		ret = self._recreate_db()
+        return ret
+    # end def
 
-		if not ret:
-			return -1
+    def parse(self, filename:str, database:str) -> int:
+        self._sql = sqlite3.connect(database)
 
-		self._load_data(filename)
+        ret = self._recreate_db()
 
-		self._sql.commit()
+        if not ret:
+            return -1
 
-		self._sql.close()
+        self._load_data(filename)
 
-		return 0
+        self._sql.commit()
+
+        self._sql.close()
+
+        return 0
 
 #-------------------------------------------------------------------+
 #	startup
 #-------------------------------------------------------------------+
 if __name__ == "__main__":
-	separator = "\r\n+----------------------------+\r\n"
+    separator = "\r\n+----------------------------+\r\n"
 
-	filebase = "input"
+    filebase = "test_data2"
 
-	filename = "{}/{}.txt".format(os.path.dirname(__file__), filebase)
-	database = "{}/{}.db3".format(os.path.dirname(__file__), filebase)
+    filename = "{}/{}.txt".format(os.path.dirname(__file__), filebase)
+    database = "{}/{}.db3".format(os.path.dirname(__file__), filebase)
 
-	print(separator)
+    print(separator)
 
-	alg = Algorithm()
-	data = alg.parse(filename, database)
-	print("\nTotal rules: {}".format(data))
+    alg = Algorithm()
+    data = alg.parse(filename, database)
+    print("\nTotal rules: {}".format(data))
 
-	print(separator)	
+    print(separator)	
