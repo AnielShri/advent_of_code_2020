@@ -125,7 +125,7 @@ class Algorithm:
 if __name__ == "__main__":
 	separator = "\r\n+----------------------------+\r\n"
 
-	filebase = "input"
+	filebase = "test_data2"
 
 	filename = "{}/{}.txt".format(os.path.dirname(__file__), filebase)
 	database = "{}/{}.db3".format(os.path.dirname(__file__), filebase)
